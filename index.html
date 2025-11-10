@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="css/leaflet.photon.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <title>QGIS Interactive Web Map</title>
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Tampilkan / Sembunyikan Sidebar">☰</button>
+        <h1>Peta Interaktif QGIS</h1>
+        <p>Kelompok 2 Metrapan</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Panel -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 Lapisan & Kontrol</h2>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('layers-tab', event)">Lapisan</button>
+                <button class="tab-button" onclick="switchTab('info-tab', event)">Informasi</button>
+                <button class="tab-button" onclick="switchTab('team-tab', event)">Tim</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <!-- LAYERS TAB -->
+            <div id="layers-tab" class="tab-content active">
+                <div class="layers-section">
+                    <div class="layers-section-title">Lapisan Dasar</div>
+                    <div class="layer-item">
+                        <input type="radio" id="layer-osm" name="baselayer" value="osm" checked onchange="toggleBaseLayer(this)">
+                        <label class="layer-label" for="layer-osm">OpenStreetMap</label>
+                    </div>
+
+                    <div class="layers-section-title" style="margin-top: 15px;">Lapisan Data</div>
+
+                    <div class="layer-item">
+                        <input type="checkbox" id="layer-nox" checked onchange="toggleLayer(this, 'layer_NOxItera_1')">
+                        <div>
+                            <label class="layer-label" for="layer-nox">NOx Iterasi (Kualitas Udara)</label>
+                            <div class="layer-info">Tingkat konsentrasi berwarna</div>
+                        </div>
+                    </div>
+
+                    <div class="layer-item">
+                        <input type="checkbox" id="layer-invnt" checked onchange="toggleLayer(this, 'layer_Invntarisasi_2')">
+                        <div>
+                            <label class="layer-label" for="layer-invnt">Inventarisasi (Satelit)</label>
+                            <div class="layer-info">Data overlay citra</div>
+                        </div>
+                    </div>
+
+                    <div class="layer-item">
+                        <input type="checkbox" id="layer-hysp" checked onchange="toggleLayer(this, 'layer_hysp_3')">
+                        <div>
+                            <label class="layer-label" for="layer-hysp">Trajektori HYSPLIT</label>
+                            <div class="layer-info">Jalur trajektori cuaca</div>
+                        </div>
+                    </div>
+
+                    <div class="layer-item">
+                        <input type="checkbox" id="layer-export" checked onchange="toggleLayer(this, 'layer_Export_Output_4')">
+                        <div>
+                            <label class="layer-label" for="layer-export">Hasil Ekspor</label>
+                            <div class="layer-info">📦 Data analisis poligon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                    <div class="legend">
+                    <h3>Legenda Konsentrasi NOx</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(68,1,84,1.0);"></div>
+                        <span>0.55 - 1.17 µg/m³</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(59,82,139,1.0);"></div>
+                        <span>1.17 - 4.20 µg/m³</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(33,144,141,1.0);"></div>
+                        <span>4.20 - 8.30 µg/m³</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(93,201,99,1.0);"></div>
+                        <span>8.30 - 27.00 µg/m³</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(253,231,37,1.0);"></div>
+                        <span>27.00 - 57.57 µg/m³</span>
+                    </div>
+                </div>
+
+                <!-- Tools -->
+                <div class="features-section">
+                    <div class="features-title">Alat</div>
+                    <button class="feature-button" onclick="toggleMeasure()">Ukur</button>
+                    <button class="feature-button" onclick="toggleFullScreen()">Layar Penuh</button>
+                    <button class="feature-button" onclick="resetMapView()">Atur Ulang</button>
+                    <button class="feature-button" onclick="exportMapData()">Ekspor</button>
+                </div>
+            </div>
+
+            <!-- INFO TAB -->
+            <div id="info-tab" class="tab-content">
+            <div class="map-info-section">
+                <h3>Informasi Peta</h3>
+                    <div class="info-stat">
+                        <span class="stat-label">Judul Proyek:</span>
+                        <span class="stat-value">Pemetaan Web QGIS</span>
+                    </div>
+                    <div class="info-stat">
+                        <span class="stat-label">Lokasi:</span>
+                        <span class="stat-value">Indonesia</span>
+                    </div>
+                    <div class="info-stat">
+                        <span class="stat-label">Koordinat:</span>
+                        <span class="stat-value">-0.37°, 105.31°</span>
+                    </div>
+                    <div class="info-stat">
+                        <span class="stat-label">Lapisan:</span>
+                        <span class="stat-value">4 Aktif</span>
+                    </div>
+                    <div class="info-stat">
+                        <span class="stat-label">Proyeksi:</span>
+                        <span class="stat-value">WGS84 (EPSG:4326)</span>
+                    </div>
+                    <div class="info-stat">
+                        <span class="stat-label">Jenis Data:</span>
+                        <span class="stat-value">Vektor & Raster</span>
+                    </div>
+                </div>
+
+                <div class="map-info-section" style="background: #fce4ec; border-left-color: #c2185b;">
+                    <h3 style="color: #c2185b;">Statistik Dataset</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-value">3</div>
+                            <div class="stat-card-label">Trajektori</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value">57.6</div>
+                            <div class="stat-card-label">Maks NOx</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value">4</div>
+                            <div class="stat-card-label">Lapisan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value">1</div>
+                            <div class="stat-card-label">Lapisan Overlay</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Tentang Proyek Ini</h3>
+                    <p>Peta web interaktif ini menggabungkan data spasial dari QGIS dengan Leaflet.js untuk visualisasi berbasis web. Menampilkan data pemantauan kualitas udara (konsentrasi NOx) dan trajektori cuaca HYSPLIT dari NOAA, memberikan tinjauan komprehensif kondisi atmosfer di Indonesia.</p>
+                </div>
+                
+                <!-- Detailed Map Information Paragraph -->
+                <div class="info-section">
+                    <h3>Informasi Peta Detail</h3>
+                    <p>Peta web ini dibuat dari ekspor QGIS dan mencakup beberapa lapisan vektor dan raster. Lapisan konsentrasi NOx memvisualisasikan tingkat nitrogen oksida atmosfer yang dimodelkan atau diukur menggunakan klasifikasi choropleth 5-kelas. Trajektori HYSPLIT menunjukkan jalur transport partikel dan dapat digunakan bersama overlay konsentrasi untuk menganalisis hubungan sumber-penerima potensial. Overlay citra inventaris menyediakan citra satelit kontekstual. Gunakan kontrol lapisan untuk mengalihkan visibilitas dan alat untuk mengukur jarak atau mengekspor data yang dipilih untuk analisis lebih lanjut.</p>
+                </div>
+            </div>
+
+            <!-- TEAM TAB -->
+            <div id="team-tab" class="tab-content">
+                <div class="team-section">
+                    <h3>Anggota Tim Proyek</h3>
+
+                    <div class="team-member">
+                        <div class="member-photo" aria-hidden="true">
+                            <img src="images/member1.jpg" alt="Foto Anggota 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.nextElementSibling.style.display='none';" />
+                            <svg class="fallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Anggota Tim 1">
+                                <rect width="100" height="100" fill="#764ba2" rx="12" />
+                                <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">TM1</text>
+                            </svg>
+                        </div>
+                        <div class="member-details">
+                            <p class="member-name">Alvina Etimanta Br Perangin angin</p>
+                            <p class="member-role">122290077</p>
+                           
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-photo" aria-hidden="true">
+                            <img src="images/member2.jpg" alt="Foto Anggota 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.nextElementSibling.style.display='none';" />
+                            <svg class="fallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Anggota Tim 2">
+                                <rect width="100" height="100" fill="#4b7bd6" rx="12" />
+                                <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">TM2</text>
+                            </svg>
+                        </div>
+                        <div class="member-details">
+                            <p class="member-name">Denai Assyifa Qalbu</p>
+                            <p class="member-role">122290070</p>
+                           
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-photo" aria-hidden="true">
+                            <img src="images/member3.jpg" alt="Foto Anggota 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.nextElementSibling.style.display='none';" />
+                            <svg class="fallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Anggota Tim 3">
+                                <rect width="100" height="100" fill="#2aa876" rx="12" />
+                                <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">TM3</text>
+                            </svg>
+                        </div>
+                        <div class="member-details">
+                            <p class="member-name">Ezra Putri Tampubolon</p>
+                            <p class="member-role">122290073</p>
+                            
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-photo" aria-hidden="true">
+                            <img src="images/member4.jpg" alt="Foto Anggota 4" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.nextElementSibling.style.display='none';" />
+                            <svg class="fallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Anggota Tim 4">
+                                <rect width="100" height="100" fill="#f39c12" rx="12" />
+                                <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">TM4</text>
+                            </svg>
+                        </div>
+                        <div class="member-details">
+                            <p class="member-name">M. Joy Stevanie Sitorus</p>
+                            <p class="member-role">122290026</p>
+                            
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-photo" aria-hidden="true">
+                            <img src="images/member5.jpg" alt="Foto Anggota 5" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" onload="this.nextElementSibling.style.display='none';" />
+                            <svg class="fallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Anggota Tim 5">
+                                <rect width="100" height="100" fill="#e15759" rx="12" />
+                                <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">TM5</text>
+                            </svg>
+                        </div>
+                        <div class="member-details">
+                            <p class="member-name">Maria Vivalda</p>
+                            <p class="member-role">122290022</p>
+                            
+                        </div>
+                    </div>
+
+                </div>
+
+                
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-area">
+            <div id="map" class="map-centered"></div>
+        </div>
+    </div>
+
+    <!-- Scripts - Library Dependencies -->
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet.photon.js"></script>
+
+    <!-- Data Files -->
+    <script src="data/NOxItera_1.js"></script>
+    <script src="data/hysp_3.js"></script>
+    <script src="data/Export_Output_4.js"></script>
+
+    <!-- Tab Switching and Layer Management Functions -->
+    <script>
+        function switchTab(tabName, ev) {
+            // Hide all tabs
+            var tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(function(tab) { tab.classList.remove('active'); });
+
+            // Remove active state from buttons
+            var buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(function(btn) { btn.classList.remove('active'); });
+
+            // Show selected tab
+            var t = document.getElementById(tabName);
+            if (t) t.classList.add('active');
+
+            // Add active state to clicked button
+            if (ev && ev.currentTarget) ev.currentTarget.classList.add('active');
+        }
+
+        function toggleLayer(checkbox, layerName) {
+            var layer = layerReferences[layerName];
+            if (layer) {
+                if (checkbox.checked) map.addLayer(layer); else map.removeLayer(layer);
+            }
+        }
+
+        function toggleBaseLayer(radio) { console.log('Base layer toggled to:', radio.value); }
+    function toggleMeasure() { alert('Alat ukur diaktifkan! Klik pada peta untuk mengukur jarak.'); }
+    function toggleFullScreen() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>alert('Tidak dapat memasuki mode layar penuh')); }
+    function resetMapView() { if (typeof map !== 'undefined') map.fitBounds([[-0.37569165617498024, 105.30691042474194], [-0.36367927082495133, 105.32726273425817]]); }
+    function exportMapData() { alert('Mengekspor data peta sebagai GeoJSON...'); }
+
+        var layerReferences = {};
+    </script>
+
+    <!-- Main Map Script -->
+    <script src="script.js"></script>
+</body>
+</html>
